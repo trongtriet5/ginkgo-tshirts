@@ -1,0 +1,180 @@
+.navbar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: var(--space-16) var(--space-32);
+  background-color: var(--color-surface-muted);
+  border-bottom: 1px solid var(--color-surface-strong);
+  position: sticky;
+  top: 0;
+  z-index: 100;
+  transition: background-color var(--motion-duration-instant) ease-out;
+}
+
+.logo {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex: 0 1 auto;
+}
+
+.logoImage {
+  height: 50px;
+  width: auto;
+  object-fit: contain;
+  display: block;
+}
+
+.navLinks {
+  display: flex;
+  gap: var(--space-16);
+  flex: 1;
+  justify-content: flex-start;
+}
+
+.navLink {
+  color: var(--color-text-secondary);
+  font-size: var(--font-size-lg);
+  font-weight: 500;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  position: relative;
+  padding: var(--space-8) 0;
+}
+
+.navLink::after {
+  content: '';
+  position: absolute;
+  bottom: 0px;
+  left: 0;
+  width: 0%;
+  height: 1px;
+  background-color: var(--color-text-primary);
+  transition: width var(--motion-duration-instant) ease-out;
+}
+
+.navLink:hover::after {
+  width: 100%;
+}
+
+.navLink:hover {
+  color: var(--color-text-primary);
+}
+
+.navItem {
+  position: relative;
+}
+
+.dropdown {
+  position: absolute;
+  top: 100%;
+  left: 0;
+  background-color: var(--color-surface-muted);
+  border: 1px solid var(--color-surface-strong);
+  min-width: 200px;
+  padding: var(--space-16) 0;
+  opacity: 0;
+  visibility: hidden;
+  transform: translateY(10px);
+  transition: all var(--motion-duration-instant) ease-out;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+  display: flex;
+  flex-direction: column;
+  z-index: 200;
+}
+
+.navItem:hover .dropdown {
+  opacity: 1;
+  visibility: visible;
+  transform: translateY(0);
+}
+
+.dropdownLink {
+  padding: var(--space-8) var(--space-24);
+  color: var(--color-text-secondary);
+  font-size: var(--font-size-md);
+  text-transform: capitalize;
+  transition: color var(--motion-duration-instant) ease-out, background-color var(--motion-duration-instant) ease-out;
+}
+
+.dropdownLink:hover {
+  color: var(--color-text-primary);
+  background-color: var(--color-surface-raised);
+}
+
+.actions {
+  display: flex;
+  gap: var(--space-10);
+  align-items: center;
+  flex: 1;
+  justify-content: flex-end;
+}
+
+.actionButton {
+  background: none;
+  border: none;
+  cursor: pointer;
+  font-size: var(--font-size-lg);
+  color: var(--color-text-secondary);
+  transition: color var(--motion-duration-instant) ease-out;
+  text-transform: uppercase;
+}
+
+.actionButton:hover {
+  color: var(--color-text-primary);
+}
+
+.langToggle {
+  font-weight: 500;
+  width: 32px;
+  text-align: center;
+  transition: all 0.2s ease;
+}
+
+.langToggle:hover {
+  transform: scale(1.05);
+}
+
+.divider {
+  width: 1px;
+  height: 14px;
+  background-color: var(--color-text-secondary);
+  opacity: 0.5;
+  margin: 0 var(--space-8);
+}
+
+.iconButton {
+  background: none;
+  border: none;
+  cursor: pointer;
+  color: var(--color-text-primary);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: transform 0.2s ease, opacity 0.2s ease;
+}
+
+.iconButton:hover {
+  opacity: 0.7;
+  transform: scale(1.05);
+}
+
+.searchWrapper {
+  position: relative;
+}
+
+.cartCount {
+  position: absolute;
+  top: -5px;
+  right: -8px;
+  background-color: var(--color-text-primary);
+  color: var(--color-surface-muted);
+  font-size: 10px;
+  font-weight: 600;
+  border-radius: 50%;
+  width: 16px;
+  height: 16px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
