@@ -2,7 +2,7 @@
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding: var(--space-16) var(--space-32);
+  padding: var(--space-10) var(--space-32);
   background-color: var(--color-surface-muted);
   border-bottom: 1px solid var(--color-surface-strong);
   position: sticky;
@@ -19,7 +19,7 @@
 }
 
 .logoImage {
-  height: 50px;
+  height: 40px;
   width: auto;
   object-fit: contain;
   display: block;
@@ -110,37 +110,10 @@
   justify-content: flex-end;
 }
 
-.actionButton {
-  background: none;
-  border: none;
-  cursor: pointer;
-  font-size: var(--font-size-lg);
-  color: var(--color-text-secondary);
-  transition: color var(--motion-duration-instant) ease-out;
-  text-transform: uppercase;
-}
-
-.actionButton:hover {
-  color: var(--color-text-primary);
-}
-
-.langToggle {
-  font-weight: 500;
-  width: 32px;
-  text-align: center;
-  transition: all 0.2s ease;
-}
-
-.langToggle:hover {
-  transform: scale(1.05);
-}
-
-.divider {
-  width: 1px;
-  height: 14px;
-  background-color: var(--color-text-secondary);
-  opacity: 0.5;
-  margin: 0 var(--space-8);
+.cartButton {
+  display: flex;
+  align-items: center;
+  position: relative;
 }
 
 .iconButton {
@@ -161,6 +134,46 @@
 
 .searchWrapper {
   position: relative;
+}
+
+.currencyGroup {
+  display: flex;
+  gap: 2px;
+  margin-right: var(--space-4);
+  border: 1px solid var(--color-surface-strong);
+  border-radius: 4px;
+  overflow: hidden;
+}
+
+.currencyBtn {
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 4px 8px;
+  font-size: var(--font-size-xs);
+  font-weight: 500;
+  color: var(--color-text-tertiary);
+  transition: background-color 0.15s ease, color 0.15s ease;
+}
+
+.currencyBtn:hover:not(:disabled) {
+  background-color: var(--color-surface-raised);
+  color: var(--color-text-primary);
+}
+
+.currencyBtn:disabled {
+  opacity: 0.4;
+  cursor: default;
+}
+
+.currencyActive {
+  background-color: var(--color-text-primary);
+  color: var(--color-surface-muted);
+}
+
+.currencyActive:hover:not(:disabled) {
+  background-color: var(--color-text-primary);
+  color: var(--color-surface-muted);
 }
 
 .cartCount {

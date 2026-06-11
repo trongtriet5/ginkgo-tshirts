@@ -1,63 +1,53 @@
 "use client";
 
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import Link from 'next/link';
+import Image from 'next/image';
+import PriceDisplay from './PriceDisplay';
 import styles from './ProductListing.module.css';
 
 interface Product {
   id: number;
   name: string;
   category: string;
-  price: string;
+  priceValue: number | null;
+  sizes?: string[];
 }
 
 interface ProductListingProps {
   title: string;
   products: Product[];
+  page?: number;
+  totalPages?: number;
+  onPageChange?: (page: number) => void;
 }
 
-export default function ProductListing({ title, products: initialProducts }: ProductListingProps) {
+export default function ProductListing({ 
+  title, 
+  products: initialProducts,
+  page = 1,
+  totalPages = 1,
+  onPageChange
+}: ProductListingProps) {
   const [isFilterOpen, setIsFilterOpen] = useState(false);
-  const [products, setProducts] = useState<Product[]>(initialProducts || []);
-  const [loading, setLoading] = useState(!initialProducts || initialProducts.length === 0);
 
-  useEffect(() => {
-    // Only fetch if no initial products were provided (so we can still use static fallback in some places)
-    if (!initialProducts || initialProducts.length === 0) {
-      const fetchProducts = async () => {
-        try {
-          const res = await fetch('http://localhost:3333/products');
-          if (res.ok) {
-            const data = await res.json();
-            setProducts(data);
-          }
-        } catch (error) {
-          console.error("Failed to fetch products:", error);
-        } finally {
-          setLoading(false);
-        }
-      };
-      fetchProducts();
-    }
-  }, [initialProducts]);
-  
+  const products = initialProducts || [];
+
   return (
     <>
       <div className={styles.pageHeader}>
         <h1 className={styles.title}>{title}</h1>
         <div className={styles.headerActions}>
-          <span className={styles.productCount}>{products.length} Products</span>
-          <button 
-            className={styles.mobileFilterButton} 
+          <span className={styles.productCount}>{products.length} Products (Page {page})</span>
+          <button
+            className={styles.mobileFilterButton}
             onClick={() => setIsFilterOpen(true)}
           >
             Filters
           </button>
         </div>
       </div>
-
       <div className={styles.container}>
-        {/* Sidebar Filter */}
         <aside className={`${styles.sidebar} ${isFilterOpen ? styles.sidebarOpen : ''}`}>
           <div className={styles.mobileFilterHeader}>
             <h2>Filters</h2>
@@ -87,36 +77,61 @@ export default function ProductListing({ title, products: initialProducts }: Pro
               <li className={styles.filterItem}><input type="checkbox" /> Navy</li>
             </ul>
           </div>
-          <div className={styles.mobileFilterFooter}>
-            <button className={styles.applyFilterBtn} onClick={() => setIsFilterOpen(false)}>Apply Filters</button>
-          </div>
         </aside>
 
         {isFilterOpen && <div className={styles.filterBackdrop} onClick={() => setIsFilterOpen(false)} />}
 
-        {/* Product Grid */}
-        <main className={styles.grid}>
-          {loading ? (
-            <p>Loading products from Oracle DB...</p>
-          ) : (
-            products.map(product => (
-              <Link key={product.id} href={`/clothing/${product.id}`} passHref legacyBehavior>
-                <a className={styles.productCard}>
+        <div className={styles.mainContent}>
+          <main className={styles.grid}>
+            {products.length === 0 ? (
+              <p>Loading products...</p>
+            ) : (
+              products.map(product => (
+                <Link
+                  key={product.id}
+                  href={`/clothing/${product.id}?name=${encodeURIComponent(product.name)}&priceValue=${product.priceValue ?? ''}&cat=${encodeURIComponent(product.category || '')}${product.sizes?.length ? `&sizes=${encodeURIComponent(product.sizes.join(','))}` : ''}`}
+                  className={styles.productCard}
+                >
                   <div className={styles.imageContainer}>
-                    <div className={styles.primaryImage} style={{background: '#eaeaea'}} />
-                    <div className={styles.secondaryImage} style={{background: '#dcdcdc'}} />
-                    <button className={styles.quickAdd} onClick={(e) => e.preventDefault()}>Quick Add</button>
+                    <Image
+                      src={`/ginkgo${((product.id - 1) % 5) + 1}.jpg`}
+                      alt=""
+                      fill
+                      className={styles.productImage}
+                    />
                   </div>
                   <div className={styles.productInfo}>
                     <span className={styles.productName}>{product.name}</span>
                     <span className={styles.productCategory}>{product.category || 'Apparel'}</span>
-                    <span className={styles.productPrice}>{product.price ? `₫${product.price.toLocaleString()}` : 'Contact'}</span>
+                    <PriceDisplay vndAmount={product.priceValue} className={styles.productPrice} />
                   </div>
-                </a>
-              </Link>
-            ))
+                </Link>
+              ))
+            )}
+          </main>
+          
+          {totalPages > 1 && onPageChange && (
+            <div className={styles.pagination}>
+              <button 
+                className={styles.pageButton} 
+                disabled={page <= 1}
+                onClick={() => onPageChange(page - 1)}
+              >
+                Previous
+              </button>
+              <span className={styles.pageInfo}>
+                Page {page} of {totalPages}
+              </span>
+              <button 
+                className={styles.pageButton} 
+                disabled={page >= totalPages}
+                onClick={() => onPageChange(page + 1)}
+              >
+                Next
+              </button>
+            </div>
           )}
-        </main>
+        </div>
       </div>
     </>
   );

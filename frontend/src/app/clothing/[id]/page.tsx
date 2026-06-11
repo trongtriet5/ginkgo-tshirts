@@ -1,41 +1,97 @@
+import ProductImageSlider from '../../components/ProductImageSlider';
+import PriceDisplay from '../../components/PriceDisplay';
 import styles from './page.module.css';
 
-export default async function ProductDetailPage({ params }: { params: Promise<{ id: string }> }) {
+interface ProductDetail {
+  id: string;
+  name: string;
+  code: string;
+  color: string;
+  size: string;
+  price: number | null;
+  category: string;
+  availableColors: string[];
+  availableSizes: string[];
+}
+
+export default async function ProductDetailPage({ 
+  params,
+  searchParams,
+}: { 
+  params: Promise<{ id: string }>,
+  searchParams: Promise<{ name?: string; priceValue?: string; cat?: string; sizes?: string }>,
+}) {
   const { id } = await params;
-  
+  const { name: qName, priceValue: qPriceValue, cat: qCat, sizes: qSizes } = await searchParams;
+  const numId = Number(id);
+
+  // Use search params from listing as primary source (works without backend)
+  const productName = qName || `Organic Cotton T-Shirt ${id}`;
+  const productPriceVnd = qPriceValue ? Number(qPriceValue) : null;
+
+  // Determine display color from query params
+  let displayColor = '';
+  if (qCat) {
+    if (qCat.startsWith('Color: ')) {
+      displayColor = qCat.replace('Color: ', '');
+    } else {
+      displayColor = qCat;
+    }
+  }
+
+  // Try backend for extra data (sizes, color variants)
+  let product: ProductDetail | null = null;
+  try {
+    const res = await fetch(`http://localhost:3333/products/${id}`, { cache: 'no-store' });
+    if (res.ok) {
+      product = await res.json();
+    }
+  } catch {
+    // Backend unavailable
+  }
+
+  // Sizes from search params (listing knows the real sizes)
+  const paramSizes = qSizes ? qSizes.split(',').filter(Boolean) : [];
+  // Try backend for extra size/color data, fall back to search params, then defaults
+  const sizes = paramSizes.length > 0 ? paramSizes :
+    (product?.availableSizes?.length ? product.availableSizes : ['S', 'M', 'L', 'XL']);
+  const colors = (product?.availableColors?.length ? product.availableColors : 
+    displayColor ? [displayColor, 'Noir', 'Navy'] : ['Blanc', 'Noir', 'Navy']);
+  const colorLabel = displayColor || product?.color || 'Blanc';
+
+  const images = [
+    `/ginkgo${((numId - 1) % 5) + 1}.jpg`,
+    `/ginkgo${((numId) % 5) + 1}.jpg`,
+    `/ginkgo${((numId + 1) % 5) + 1}.jpg`,
+    `/ginkgo${((numId + 2) % 5) + 1}.jpg`,
+  ];
+
   return (
     <div className={styles.container}>
-      <div className={styles.imageGallery}>
-        <div className={styles.imagePlaceholder} style={{background: '#eaeaea'}} />
-        <div className={styles.imagePlaceholder} style={{background: '#dcdcdc'}} />
-        <div className={styles.imagePlaceholder} style={{background: '#cccccc'}} />
-        <div className={styles.imagePlaceholder} style={{background: '#bbbbbb'}} />
-      </div>
+      <ProductImageSlider images={images} productName={productName} />
 
       <div className={styles.details}>
-        <span className={styles.brand}>L'Atelier Ginkgo</span>
-        <h1 className={styles.title}>Organic Cotton T-Shirt {id}</h1>
-        <div className={styles.price}>€45</div>
+        <h1 className={styles.title}>{productName}</h1>
+        <PriceDisplay vndAmount={productPriceVnd} className={styles.price} />
 
         <div className={styles.section}>
-          <div className={styles.sectionTitle}>Color: Blanc</div>
+          <div className={styles.sectionTitle}>Color: {colorLabel}</div>
           <div className={styles.colorOptions}>
-            <button className={styles.colorSwatch} style={{ backgroundColor: '#ffffff' }} aria-label="Blanc" />
-            <button className={styles.colorSwatch} style={{ backgroundColor: '#000000' }} aria-label="Noir" />
-            <button className={styles.colorSwatch} style={{ backgroundColor: '#1a365d' }} aria-label="Navy" />
+            {colors.map(c => (
+              <button key={c} className={styles.colorSwatch} aria-label={c} />
+            ))}
           </div>
         </div>
 
         <div className={styles.section}>
           <div className={styles.sectionTitle}>
             <span>Size</span>
-            <span style={{ textDecoration: 'underline', cursor: 'pointer', color: 'var(--color-text-tertiary)'}}>Size Guide</span>
+            <span className={styles.sizeGuide}>Size Guide</span>
           </div>
           <div className={styles.sizeOptions}>
-            <button className={styles.sizeButton}>S</button>
-            <button className={styles.sizeButton}>M</button>
-            <button className={styles.sizeButton}>L</button>
-            <button className={styles.sizeButton}>XL</button>
+            {sizes.map(s => (
+              <button key={s} className={styles.sizeButton}>{s}</button>
+            ))}
           </div>
         </div>
 

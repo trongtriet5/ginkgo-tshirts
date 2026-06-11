@@ -1,6 +1,9 @@
 import type { Metadata } from "next";
 import { Noto_Sans } from "next/font/google";
 import "./globals.css";
+import { CurrencyProvider } from "./context/CurrencyProvider";
+import Navbar from "./components/Navbar";
+import Footer from "./components/Footer";
 
 const notoSans = Noto_Sans({
   variable: "--font-noto-sans",
@@ -12,20 +15,19 @@ export const metadata: Metadata = {
   description: "Discover the comfortable and original organic cotton clothing made by Ginkgo with high-quality knitwear.",
 };
 
-import Navbar from "./components/Navbar";
-import Footer from "./components/Footer";
-
 export default function RootLayout({
   children,
 }: Readonly<{
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en" className={`${notoSans.variable}`}>
+    <html lang="en" className={notoSans.variable}>
       <body>
-        <Navbar />
-        {children}
-        <Footer />
+        <CurrencyProvider>
+          <Navbar />
+          {children}
+          <Footer />
+        </CurrencyProvider>
       </body>
     </html>
   );

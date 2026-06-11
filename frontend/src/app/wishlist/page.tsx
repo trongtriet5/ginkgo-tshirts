@@ -1,8 +1,14 @@
+import type { Metadata } from 'next';
 import styles from './page.module.css';
 import Link from 'next/link';
 
+export const metadata: Metadata = {
+  title: 'Wishlist | Ginkgo T-Shirts',
+  description: 'Your saved items.',
+};
+
 export default function WishlistPage() {
-  const wishlistItems = []; // Empty for now to show empty state
+  const wishlistItems: never[] = [];
 
   return (
     <div className={styles.container}>
@@ -11,13 +17,13 @@ export default function WishlistPage() {
 
       {wishlistItems.length > 0 ? (
         <div className={styles.grid}>
-          {/* Reuse product card styles here when items exist */}
+          {/* Product cards when items exist */}
         </div>
       ) : (
         <div className={styles.emptyState}>
           <p>Your wishlist is currently empty.</p>
-          <Link href="/clothing">
-            <button>Discover New Arrivals</button>
+          <Link href="/clothing" className={styles.discoverButton}>
+            Discover New Arrivals
           </Link>
         </div>
       )}

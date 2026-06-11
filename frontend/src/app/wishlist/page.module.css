@@ -35,13 +35,13 @@
   color: var(--color-text-secondary);
 }
 
-.emptyState button {
+.discoverButton {
   margin-top: var(--space-16);
   padding: var(--space-6) var(--space-16);
   background-color: var(--color-surface-base);
   color: var(--color-text-inverse);
-  border: none;
   font-size: var(--font-size-md);
+  text-transform: uppercase;
   cursor: pointer;
 }
 

@@ -32,6 +32,49 @@
   color: var(--color-text-primary);
 }
 
+.storesRow {
+  grid-column: 1 / -1;
+  border-top: 1px solid var(--color-surface-strong);
+  padding-top: var(--space-24);
+  margin-top: var(--space-8);
+}
+
+.storesTitle {
+  font-size: var(--font-size-md);
+  font-weight: 600;
+  text-transform: uppercase;
+  color: var(--color-text-primary);
+  letter-spacing: 1px;
+  margin-bottom: var(--space-16);
+}
+
+.storesGrid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: var(--space-32);
+}
+
+.storeCity {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4);
+}
+
+.storeCityName {
+  font-size: var(--font-size-sm);
+  font-weight: 600;
+  color: var(--color-text-primary);
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  margin-bottom: var(--space-4);
+}
+
+.storeAddress {
+  color: var(--color-text-tertiary);
+  font-size: var(--font-size-sm);
+  line-height: 1.5;
+}
+
 .bottomBar {
   grid-column: 1 / -1;
   border-top: 1px solid var(--color-surface-strong);

@@ -100,49 +100,8 @@
   margin-bottom: var(--space-8);
 }
 
-.primaryImage,
-.secondaryImage {
-  width: 100%;
-  height: 100%;
+.productImage {
   object-fit: cover;
-  transition: opacity var(--motion-duration-instant) ease-out;
-  position: absolute;
-  top: 0;
-  left: 0;
-}
-
-.secondaryImage {
-  opacity: 0;
-}
-
-.productCard:hover .primaryImage {
-  opacity: 0;
-}
-
-.productCard:hover .secondaryImage {
-  opacity: 1;
-}
-
-.quickAdd {
-  position: absolute;
-  bottom: var(--space-8);
-  left: 50%;
-  transform: translateX(-50%) translateY(20px);
-  opacity: 0;
-  background-color: var(--color-surface-base);
-  color: var(--color-text-inverse);
-  padding: var(--space-4) var(--space-12);
-  border: none;
-  border-radius: var(--radius-xs);
-  font-size: var(--font-size-sm);
-  text-transform: uppercase;
-  cursor: pointer;
-  transition: opacity var(--motion-duration-instant) ease-out, transform var(--motion-duration-instant) ease-out;
-}
-
-.productCard:hover .quickAdd {
-  opacity: 1;
-  transform: translateX(-50%) translateY(0);
 }
 
 .productInfo {
@@ -186,15 +145,56 @@
   display: none;
 }
 
-.mobileFilterFooter {
-  display: none;
-}
-
 .filterBackdrop {
   display: none;
 }
 
 /* Mobile responsive adjustments */
+.mainContent {
+  flex-grow: 1;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-32);
+}
+
+.pagination {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: var(--space-24);
+  padding-top: var(--space-32);
+  border-top: 1px solid var(--color-surface-strong);
+  margin-top: auto;
+}
+
+.pageButton {
+  padding: var(--space-8) var(--space-16);
+  background-color: var(--color-surface-muted);
+  border: 1px solid var(--color-surface-base);
+  color: var(--color-text-primary);
+  font-size: var(--font-size-md);
+  cursor: pointer;
+  border-radius: var(--radius-xs);
+  transition: all var(--motion-duration-instant) ease;
+}
+
+.pageButton:hover:not(:disabled) {
+  background-color: var(--color-surface-base);
+  color: var(--color-surface-muted);
+}
+
+.pageButton:disabled {
+  border-color: var(--color-surface-strong);
+  color: var(--color-text-tertiary);
+  cursor: not-allowed;
+  opacity: 0.5;
+}
+
+.pageInfo {
+  font-size: var(--font-size-md);
+  color: var(--color-text-secondary);
+}
+
 @media (max-width: 1024px) {
   .grid {
     grid-template-columns: repeat(2, 1fr);
@@ -262,19 +262,4 @@
     animation: fadeIn var(--motion-duration-instant) ease-out;
   }
 
-  .mobileFilterFooter {
-    display: block;
-    margin-top: auto;
-    padding-top: var(--space-16);
-  }
-
-  .applyFilterBtn {
-    width: 100%;
-    padding: var(--space-12);
-    background-color: var(--color-surface-base);
-    color: var(--color-text-inverse);
-    border: none;
-    font-size: var(--font-size-md);
-    cursor: pointer;
-  }
 }

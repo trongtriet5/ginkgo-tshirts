@@ -34,17 +34,20 @@ export default function SearchOverlay({ isOpen, onClose }: SearchOverlayProps) {
   useEffect(() => {
     if (!isOpen) return;
 
+    const handleClickOutside = (e: MouseEvent) => {
+      if (dropdownRef.current && !dropdownRef.current.contains(e.target as Node)) {
+        onClose();
+      }
+    };
+
     const timeoutId = setTimeout(() => {
-      const handleClickOutside = (e: MouseEvent) => {
-        if (dropdownRef.current && !dropdownRef.current.contains(e.target as Node)) {
-          onClose();
-        }
-      };
       document.addEventListener('mousedown', handleClickOutside);
-      return () => document.removeEventListener('mousedown', handleClickOutside);
     }, 0);
 
-    return () => clearTimeout(timeoutId);
+    return () => {
+      clearTimeout(timeoutId);
+      document.removeEventListener('mousedown', handleClickOutside);
+    };
   }, [isOpen, onClose]);
 
   if (!isOpen) return null;

@@ -4,27 +4,26 @@ import { useState } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
 import { MdSearch, MdFavoriteBorder } from 'react-icons/md';
+import { useCurrency, type CurrencyCode } from '../context/CurrencyContext';
 import styles from './Navbar.module.css';
 import CartDrawer from './CartDrawer';
 import SearchOverlay from './SearchOverlay';
 
+const CURRENCIES: { code: CurrencyCode; label: string }[] = [
+  { code: 'VND', label: 'VND' },
+  { code: 'USD', label: 'USD' },
+  { code: 'EUR', label: 'EUR' },
+];
+
 export default function Navbar() {
   const [isCartOpen, setIsCartOpen] = useState(false);
   const [isSearchOpen, setIsSearchOpen] = useState(false);
-  const [lang, setLang] = useState('EN');
-
-  const toggleLang = () => {
-    setLang(lang === 'EN' ? 'VI' : 'EN');
-  };
+  const { currency, setCurrency, loading } = useCurrency();
 
   return (
     <>
       <nav className={styles.navbar}>
         <div className={styles.navLinks}>
-          <div className={styles.navItem}>
-            <Link href="/new-arrivals" className={styles.navLink}>New Arrivals</Link>
-          </div>
-
           <div className={styles.navItem}>
             <Link href="/clothing" className={styles.navLink}>Clothing</Link>
             <div className={styles.dropdown}>
@@ -46,18 +45,6 @@ export default function Navbar() {
             </div>
           </div>
 
-          <div className={styles.navItem}>
-            <Link href="/collections" className={styles.navLink}>Collections</Link>
-            <div className={styles.dropdown}>
-              <Link href="/collections?campaign=spring" className={styles.dropdownLink}>The Spring Edit</Link>
-              <Link href="/collections?campaign=parisian" className={styles.dropdownLink}>Parisian Essentials</Link>
-              <Link href="/collections?campaign=atelier" className={styles.dropdownLink}>L'Atelier Organic</Link>
-            </div>
-          </div>
-
-          <div className={styles.navItem}>
-            <Link href="/about-us" className={styles.navLink}>About Us</Link>
-          </div>
         </div>
 
         <div className={styles.logo}>
@@ -74,14 +61,6 @@ export default function Navbar() {
         </div>
 
         <div className={styles.actions}>
-          <button 
-            className={`${styles.actionButton} ${styles.langToggle}`} 
-            onClick={toggleLang}
-            aria-label="Toggle Language"
-          >
-            {lang}
-          </button>
-          <div className={styles.divider}></div>
           <div className={styles.searchWrapper}>
             <button 
               className={styles.iconButton} 
@@ -92,16 +71,27 @@ export default function Navbar() {
             </button>
             <SearchOverlay isOpen={isSearchOpen} onClose={() => setIsSearchOpen(false)} />
           </div>
+          <div className={styles.currencyGroup}>
+            {CURRENCIES.map((c) => (
+              <button
+                key={c.code}
+                className={`${styles.currencyBtn} ${currency === c.code ? styles.currencyActive : ''}`}
+                onClick={() => setCurrency(c.code)}
+                disabled={loading}
+              >
+                {c.label}
+              </button>
+            ))}
+          </div>
           <Link href="/wishlist" className={styles.iconButton} aria-label="Wishlist">
             <MdFavoriteBorder size={26} />
           </Link>
-          <button 
-            className={styles.iconButton} 
+          <button
+            className={`${styles.iconButton} ${styles.cartButton}`}
             aria-label="Cart"
             onClick={() => setIsCartOpen(true)}
-            style={{ display: 'flex', alignItems: 'center', position: 'relative' }}
           >
-            <Image src="/cintre.png" alt="Cart" width={26} height={26} style={{ objectFit: 'contain' }} />
+            <Image src="/cintre.png" alt="" width={26} height={26} />
             <span className={styles.cartCount}>0</span>
           </button>
         </div>
