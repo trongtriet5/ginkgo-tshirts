@@ -1,0 +1,122 @@
+.container {
+  max-width: 900px;
+  margin: 0 auto;
+  padding: var(--space-32) var(--space-16);
+  min-height: calc(100vh - 70px);
+}
+
+.hero {
+  text-align: center;
+  padding: var(--space-32) 0;
+  border-bottom: 1px solid var(--color-surface-strong);
+  margin-bottom: var(--space-32);
+}
+
+.title {
+  font-size: var(--font-size-4xl);
+  font-weight: 300;
+  letter-spacing: 4px;
+  text-transform: uppercase;
+  color: var(--color-text-primary);
+  margin-bottom: var(--space-8);
+}
+
+.subtitle {
+  font-size: var(--font-size-lg);
+  color: var(--color-text-tertiary);
+  font-weight: 300;
+}
+
+.section {
+  padding: var(--space-32) 0;
+  border-bottom: 1px solid var(--color-surface-strong);
+}
+
+.section:last-child {
+  border-bottom: none;
+}
+
+.heading {
+  font-size: var(--font-size-3xl);
+  font-weight: 400;
+  color: var(--color-text-primary);
+  margin-bottom: var(--space-16);
+  text-transform: uppercase;
+  letter-spacing: 2px;
+}
+
+.paragraph {
+  font-size: var(--font-size-md);
+  color: var(--color-text-secondary);
+  line-height: 1.8;
+  margin-bottom: var(--space-12);
+}
+
+.paragraph:last-child {
+  margin-bottom: 0;
+}
+
+.materialGrid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: var(--space-24);
+  margin-top: var(--space-16);
+}
+
+.materialCard {
+  padding: var(--space-24);
+  background-color: var(--color-surface-muted);
+  border: 1px solid var(--color-surface-strong);
+  border-radius: 8px;
+}
+
+.materialTitle {
+  font-size: var(--font-size-xl);
+  font-weight: 500;
+  color: var(--color-text-primary);
+  margin-bottom: var(--space-12);
+  text-transform: uppercase;
+  letter-spacing: 1px;
+}
+
+.materialText {
+  font-size: var(--font-size-sm);
+  color: var(--color-text-secondary);
+  line-height: 1.7;
+}
+
+.techniqueGrid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: var(--space-24);
+  margin-top: var(--space-16);
+}
+
+.techniqueCard {
+  padding: var(--space-24);
+  background-color: var(--color-surface-muted);
+  border: 1px solid var(--color-surface-strong);
+  border-radius: 8px;
+}
+
+.techniqueTitle {
+  font-size: var(--font-size-xl);
+  font-weight: 500;
+  color: var(--color-text-primary);
+  margin-bottom: var(--space-12);
+  text-transform: uppercase;
+  letter-spacing: 1px;
+}
+
+.techniqueText {
+  font-size: var(--font-size-sm);
+  color: var(--color-text-secondary);
+  line-height: 1.7;
+}
+
+@media (max-width: 900px) {
+  .materialGrid,
+  .techniqueGrid {
+    grid-template-columns: 1fr;
+  }
+}

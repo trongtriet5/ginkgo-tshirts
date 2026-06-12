@@ -1,0 +1,150 @@
+.container {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: var(--space-32) var(--space-16);
+  min-height: calc(100vh - 70px);
+}
+
+.hero {
+  text-align: center;
+  padding: var(--space-32) 0;
+  border-bottom: 1px solid var(--color-surface-strong);
+  margin-bottom: var(--space-32);
+}
+
+.title {
+  font-size: var(--font-size-4xl);
+  font-weight: 300;
+  letter-spacing: 4px;
+  text-transform: uppercase;
+  color: var(--color-text-primary);
+  margin-bottom: var(--space-8);
+}
+
+.subtitle {
+  font-size: var(--font-size-lg);
+  color: var(--color-text-tertiary);
+  font-weight: 300;
+  max-width: 600px;
+  margin: 0 auto;
+  line-height: 1.6;
+}
+
+.content {
+  display: flex;
+  gap: var(--space-32);
+  align-items: flex-start;
+}
+
+.list {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-24);
+}
+
+.cityBlock {
+  padding: var(--space-24);
+  background-color: var(--color-surface-muted);
+  border: 1px solid var(--color-surface-strong);
+  border-radius: 8px;
+}
+
+.cityName {
+  font-size: var(--font-size-2xl);
+  font-weight: 400;
+  color: var(--color-text-primary);
+  margin: 0 0 var(--space-16);
+  text-transform: uppercase;
+  letter-spacing: 2px;
+}
+
+.addressList {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4);
+}
+
+.addressBtn {
+  width: 100%;
+  text-align: left;
+  background: none;
+  border: none;
+  padding: var(--space-10) var(--space-12);
+  font-size: var(--font-size-md);
+  color: var(--color-text-secondary);
+  line-height: 1.5;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: background-color var(--motion-duration-instant) ease-out,
+              color var(--motion-duration-instant) ease-out;
+}
+
+.addressBtn:hover {
+  background-color: var(--color-surface-strong);
+  color: var(--color-text-primary);
+}
+
+.addressBtnActive {
+  background-color: var(--color-surface-strong);
+  color: var(--color-text-primary);
+  font-weight: 500;
+}
+
+.mapColumn {
+  flex: 1;
+  position: sticky;
+  top: var(--space-32);
+}
+
+.mapContainer {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-12);
+}
+
+.mapIframe {
+  width: 100%;
+  height: 450px;
+  border: none;
+  border-radius: 12px;
+  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+}
+
+.mapLabel {
+  font-size: var(--font-size-sm);
+  color: var(--color-text-tertiary);
+  margin: 0;
+  text-align: center;
+}
+
+.mapPlaceholder {
+  width: 100%;
+  height: 450px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: 1px dashed var(--color-surface-strong);
+  border-radius: 12px;
+  color: var(--color-text-tertiary);
+  font-size: var(--font-size-md);
+}
+
+@media (max-width: 900px) {
+  .content {
+    flex-direction: column;
+  }
+
+  .mapColumn {
+    position: static;
+    width: 100%;
+  }
+
+  .mapIframe,
+  .mapPlaceholder {
+    height: 300px;
+  }
+}

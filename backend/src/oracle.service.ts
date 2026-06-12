@@ -1,4 +1,9 @@
-import { Injectable, Logger, OnModuleInit, OnModuleDestroy } from '@nestjs/common';
+import {
+  Injectable,
+  Logger,
+  OnModuleInit,
+  OnModuleDestroy,
+} from '@nestjs/common';
 
 // eslint-disable-next-line @typescript-eslint/no-require-imports
 const oracledb = require('oracledb');
@@ -30,7 +35,7 @@ export class OracleService implements OnModuleInit, OnModuleDestroy {
     }
   }
 
-  async query<T = any>(sql: string, params: any[] = []): Promise<T[]> {
+  async query<T = any>(sql: string, params: any[] | Record<string, any> = []): Promise<T[]> {
     let connection: any;
     try {
       connection = await this.pool.getConnection();

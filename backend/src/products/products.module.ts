@@ -1,11 +1,10 @@
 import { Module } from '@nestjs/common';
 import { ProductsService } from './products.service';
 import { ProductsController } from './products.controller';
-import { OracleService } from '../oracle.service';
+import { MysqlService } from '../mysql.service';
 
 @Module({
-  providers: [ProductsService, OracleService],
+  providers: [ProductsService, MysqlService],
   controllers: [ProductsController],
 })
 export class ProductsModule {}
-

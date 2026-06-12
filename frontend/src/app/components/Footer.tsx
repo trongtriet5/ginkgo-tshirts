@@ -1,86 +1,73 @@
 import Link from 'next/link';
+import { MdFacebook } from 'react-icons/md';
+import { FaYoutube, FaLinkedin, FaInstagram } from 'react-icons/fa';
 import styles from './Footer.module.css';
-
-const stores = [
-  {
-    city: 'Saigon',
-    addresses: [
-      '10 Le Loi Street, District 1',
-      '86 Le Loi Street, District 1',
-      '107 Dong Khoi Street, District 1',
-      '92-96 Le Loi Street, District 1',
-    ],
-  },
-  {
-    city: 'Hoi An',
-    addresses: [
-      '115 Tran Phu Street',
-      '178 Tran Phu Street',
-    ],
-  },
-  {
-    city: 'Hanoi',
-    addresses: [
-      '49 Dinh Tien Hoang Street, Hoan Kiem',
-      '60 Hang Gai Street, Hoan Kiem',
-      '79 Hang Gai Street, Hoan Kiem',
-      '44 Hang Be Street, Hoan Kiem',
-      '10 Hang Dao Street',
-    ],
-  },
-];
 
 export default function Footer() {
   return (
     <footer className={styles.footer}>
       <div className={styles.column}>
-        <h4 className={styles.columnTitle}>Assistance</h4>
-        <span className={styles.footerLink}>Customer Care</span>
-        <span className={styles.footerLink}>Delivery</span>
-        <span className={styles.footerLink}>Returns & Exchanges</span>
-        <span className={styles.footerLink}>Size Guide</span>
+        <h4 className={styles.columnTitle}>Help</h4>
+        <Link href="/faq" className={styles.footerLink}>FAQ</Link>
+        <Link href="/faq#size-guide" className={styles.footerLink}>Size guide</Link>
+        <Link href="/faq#delivery-and-returns" className={styles.footerLink}>Returns and exchange</Link>
+        <Link href="/faq#delivery-and-returns" className={styles.footerLink}>Delivery</Link>
       </div>
 
       <div className={styles.column}>
         <h4 className={styles.columnTitle}>Our World</h4>
-        <Link href="/" className={styles.footerLink}>About Ginkgo</Link>
-        <span className={styles.footerLink}>Sustainability</span>
-        <span className={styles.footerLink}>Stores</span>
+        <Link href="/the-world-of-ginkgo/story" className={styles.footerLink}>Story</Link>
+        <Link href="/the-world-of-ginkgo/stores" className={styles.footerLink}>Stores</Link>
+        <Link href="/the-world-of-ginkgo/creations" className={styles.footerLink}>Creations</Link>
       </div>
 
       <div className={styles.column}>
         <h4 className={styles.columnTitle}>Contact</h4>
-        <span className={styles.footerLink}>Contact Us</span>
-        <span className={styles.footerLink}>+84 (0) 123 456 789</span>
-        <span className={styles.footerLink}>info@ginkgotshirts.com</span>
+        <span className={styles.footerAddress}>
+          <strong>France</strong><br />
+          Ginkgo T-shirts<br />
+          56 rue permentade<br />
+          33000 Bordeaux
+        </span>
+        <span className={styles.footerAddress}>
+          <strong>Vietnam</strong><br />
+          Ginkgo T-shirts<br />
+          92-96 Le Loi street<br />
+          District 1<br />
+          Ho Chi Minh City, Vietnam
+        </span>
+        <a href="tel:+842838386161" className={styles.footerLink}>+84 28 3838 6161</a>
+        <a href="mailto:info@ginkgotshirts.com" className={styles.footerLink}>info@ginkgotshirts.com</a>
+      </div>
+
+      <div className={styles.column}>
+        <h4 className={styles.columnTitle}>Resource</h4>
+        <Link href="/terms-and-conditions" className={styles.footerLink}>Terms &amp; Conditions</Link>
+        <Link href="/privacy-policy" className={styles.footerLink}>Privacy Policy</Link>
+        <Link href="/legal-notice" className={styles.footerLink}>Legal Notice</Link>
+        <Link href="/sitemap" className={styles.footerLink}>Sitemap</Link>
       </div>
 
       <div className={styles.column}>
         <h4 className={styles.columnTitle}>Follow Us</h4>
         <div className={styles.socials}>
-          <Link href="https://instagram.com" className={styles.footerLink}>Instagram</Link>
-          <Link href="https://facebook.com" className={styles.footerLink}>Facebook</Link>
-          <Link href="https://pinterest.com" className={styles.footerLink}>Pinterest</Link>
-        </div>
-      </div>
-
-      <div className={styles.storesRow}>
-        <h4 className={styles.storesTitle}>Our Stores</h4>
-        <div className={styles.storesGrid}>
-          {stores.map((store) => (
-            <div key={store.city} className={styles.storeCity}>
-              <h5 className={styles.storeCityName}>{store.city}</h5>
-              {store.addresses.map((addr) => (
-                <span key={addr} className={styles.storeAddress}>{addr}</span>
-              ))}
-            </div>
-          ))}
+          <Link href="https://www.facebook.com/Ginkgotshirts" className={styles.socialIcon} aria-label="Facebook">
+            <MdFacebook size={22} />
+          </Link>
+          <Link href="https://www.youtube.com/@ginkgotshirts" className={styles.socialIcon} aria-label="YouTube">
+            <FaYoutube size={22} />
+          </Link>
+          <Link href="https://www.instagram.com/ginkgotshirts" className={styles.socialIcon} aria-label="Instagram">
+            <FaInstagram size={22} />
+          </Link>
+          <Link href="https://www.linkedin.com/company/ginkgo-t-shirts/" className={styles.socialIcon} aria-label="LinkedIn">
+            <FaLinkedin size={22} />
+          </Link>
         </div>
       </div>
 
       <div className={styles.bottomBar}>
         <span>&copy; {new Date().getFullYear()} Ginkgo T-Shirts. All rights reserved.</span>
-        <span>Premium French-Inspired Menswear & Accessories</span>
       </div>
     </footer>
   );

@@ -45,6 +45,15 @@ export default function Navbar() {
             </div>
           </div>
 
+          <div className={styles.navItem}>
+            <span className={styles.navLink}>The World of Ginkgo</span>
+            <div className={styles.dropdown}>
+              <Link href="/the-world-of-ginkgo/story" className={styles.dropdownLink}>Story</Link>
+              <Link href="/the-world-of-ginkgo/stores" className={styles.dropdownLink}>Stores</Link>
+              <Link href="/the-world-of-ginkgo/creations" className={styles.dropdownLink}>Creations</Link>
+            </div>
+          </div>
+
         </div>
 
         <div className={styles.logo}>

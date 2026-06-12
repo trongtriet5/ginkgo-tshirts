@@ -4,14 +4,28 @@ import { useState } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
 import PriceDisplay from './PriceDisplay';
+import SkeletonCard from './SkeletonCard';
 import styles from './ProductListing.module.css';
 
 interface Product {
   id: number;
   name: string;
   category: string;
+  typeGroup?: string;
   priceValue: number | null;
   sizes?: string[];
+}
+
+export interface FilterOptions {
+  sizes: string[];
+  colors: string[];
+  categoryGroups: string[];
+}
+
+export interface FilterState {
+  sizes: string[];
+  colors: string[];
+  categoryGroups: string[];
 }
 
 interface ProductListingProps {
@@ -20,6 +34,26 @@ interface ProductListingProps {
   page?: number;
   totalPages?: number;
   onPageChange?: (page: number) => void;
+  loading?: boolean;
+  filterOptions?: FilterOptions;
+  filterState?: FilterState;
+  onFilterChange?: (filters: FilterState) => void;
+}
+
+const COLOR_NAMES: Record<string, string> = {
+  BLK: 'Black', WHI: 'White', NAV: 'Navy', GRE: 'Grey', RED: 'Red',
+  BLU: 'Blue', GRN: 'Green', YEL: 'Yellow', ORA: 'Orange', PPA: 'Purple',
+  BOR: 'Bordeaux', OLI: 'Olive', CRE: 'Cream', JBG: 'Beige', GPE: 'Green',
+  BDE: 'Burgundy', CAM: 'Cambodge', AGD: 'Army Green', VIO: 'Violet',
+  RPM: 'Raspberry', EMR: 'Emerald', BJL: 'Bridal', NI: 'Navy Indigo',
+  BWH: 'Black White', COB: 'Cobalt', YEO: 'Yellow Orange', MNT: 'Mint',
+  MIX: 'Mix', ARM: 'Army', ATT: 'Attitude', FSK: 'Fossil', HDF: 'Hardface',
+};
+
+function toggleListItem(list: string[], item: string): string[] {
+  return list.includes(item)
+    ? list.filter((x) => x !== item)
+    : [...list, item];
 }
 
 export default function ProductListing({ 
@@ -27,11 +61,23 @@ export default function ProductListing({
   products: initialProducts,
   page = 1,
   totalPages = 1,
-  onPageChange
+  onPageChange,
+  loading,
+  filterOptions,
+  filterState,
+  onFilterChange,
 }: ProductListingProps) {
   const [isFilterOpen, setIsFilterOpen] = useState(false);
 
   const products = initialProducts || [];
+  const options = filterOptions || { sizes: [], colors: [], categoryGroups: [] };
+  const filters = filterState || { sizes: [], colors: [], categoryGroups: [] };
+
+  const handleToggle = (group: keyof FilterState, value: string) => {
+    if (!onFilterChange) return;
+    const next = { ...filters, [group]: toggleListItem(filters[group], value) };
+    onFilterChange(next);
+  };
 
   return (
     <>
@@ -53,38 +99,73 @@ export default function ProductListing({
             <h2>Filters</h2>
             <button onClick={() => setIsFilterOpen(false)} className={styles.closeFilterBtn}>×</button>
           </div>
-          <div className={styles.filterGroup}>
-            <h3 className={styles.filterTitle}>Category</h3>
-            <ul className={styles.filterList}>
-              <li className={styles.filterItem}><input type="checkbox" /> Tops</li>
-              <li className={styles.filterItem}><input type="checkbox" /> Bottoms</li>
-              <li className={styles.filterItem}><input type="checkbox" /> Accessories</li>
-            </ul>
-          </div>
-          <div className={styles.filterGroup}>
-            <h3 className={styles.filterTitle}>Size</h3>
-            <ul className={styles.filterList}>
-              <li className={styles.filterItem}><input type="checkbox" /> S</li>
-              <li className={styles.filterItem}><input type="checkbox" /> M</li>
-              <li className={styles.filterItem}><input type="checkbox" /> L</li>
-            </ul>
-          </div>
-          <div className={styles.filterGroup}>
-            <h3 className={styles.filterTitle}>Color</h3>
-            <ul className={styles.filterList}>
-              <li className={styles.filterItem}><input type="checkbox" /> Black</li>
-              <li className={styles.filterItem}><input type="checkbox" /> White</li>
-              <li className={styles.filterItem}><input type="checkbox" /> Navy</li>
-            </ul>
-          </div>
+          {options.categoryGroups.length > 0 && (
+            <div className={styles.filterGroup}>
+              <h3 className={styles.filterTitle}>Category</h3>
+              <ul className={styles.filterList}>
+                {options.categoryGroups.map((g) => (
+                  <li key={g} className={styles.filterItem}>
+                    <label>
+                      <input
+                        type="checkbox"
+                        checked={filters.categoryGroups.includes(g)}
+                        onChange={() => handleToggle('categoryGroups', g)}
+                      />
+                      {' '}{g}
+                    </label>
+                  </li>
+                ))}
+              </ul>
+            </div>
+          )}
+          {options.sizes.length > 0 && (
+            <div className={styles.filterGroup}>
+              <h3 className={styles.filterTitle}>Size</h3>
+              <ul className={styles.filterList}>
+                {options.sizes.map((s) => (
+                  <li key={s} className={styles.filterItem}>
+                    <label>
+                      <input
+                        type="checkbox"
+                        checked={filters.sizes.includes(s)}
+                        onChange={() => handleToggle('sizes', s)}
+                      />
+                      {' '}{s}
+                    </label>
+                  </li>
+                ))}
+              </ul>
+            </div>
+          )}
+          {options.colors.length > 0 && (
+            <div className={styles.filterGroup}>
+              <h3 className={styles.filterTitle}>Color</h3>
+              <ul className={styles.filterList}>
+                {options.colors.map((c) => (
+                  <li key={c} className={styles.filterItem}>
+                    <label>
+                      <input
+                        type="checkbox"
+                        checked={filters.colors.includes(c)}
+                        onChange={() => handleToggle('colors', c)}
+                      />
+                      {' '}{COLOR_NAMES[c] || c}
+                    </label>
+                  </li>
+                ))}
+              </ul>
+            </div>
+          )}
         </aside>
 
         {isFilterOpen && <div className={styles.filterBackdrop} onClick={() => setIsFilterOpen(false)} />}
 
         <div className={styles.mainContent}>
           <main className={styles.grid}>
-            {products.length === 0 ? (
-              <p>Loading products...</p>
+            {loading ? (
+              Array.from({ length: 6 }).map((_, i) => <SkeletonCard key={i} />)
+            ) : products.length === 0 ? (
+              <p>No products found.</p>
             ) : (
               products.map(product => (
                 <Link

@@ -1,0 +1,113 @@
+.container {
+  max-width: 800px;
+  margin: 0 auto;
+  padding: var(--space-32) var(--space-16);
+  min-height: calc(100vh - 70px);
+}
+
+.hero {
+  text-align: center;
+  padding: var(--space-32) 0;
+  border-bottom: 1px solid var(--color-surface-strong);
+  margin-bottom: var(--space-32);
+}
+
+.title {
+  font-size: var(--font-size-4xl);
+  font-weight: 300;
+  letter-spacing: 4px;
+  text-transform: uppercase;
+  color: var(--color-text-primary);
+  margin-bottom: var(--space-8);
+}
+
+.subtitle {
+  font-size: var(--font-size-lg);
+  color: var(--color-text-tertiary);
+  font-weight: 300;
+  margin: 0;
+  line-height: 1.6;
+}
+
+.faqList {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-32);
+}
+
+.categoryBlock {
+  display: flex;
+  flex-direction: column;
+}
+
+.categoryTitle {
+  font-size: var(--font-size-xl);
+  font-weight: 500;
+  color: var(--color-text-primary);
+  text-transform: uppercase;
+  letter-spacing: 2px;
+  margin: 0 0 var(--space-16);
+  padding-bottom: var(--space-8);
+  border-bottom: 1px solid var(--color-surface-strong);
+}
+
+.accordionItem {
+  border-bottom: 1px solid var(--color-surface-strong);
+}
+
+.accordionButton {
+  width: 100%;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: var(--space-16);
+  padding: var(--space-16) 0;
+  background: none;
+  border: none;
+  cursor: pointer;
+  font-size: var(--font-size-md);
+  font-weight: 500;
+  color: var(--color-text-primary);
+  text-align: left;
+  line-height: 1.4;
+  transition: color var(--motion-duration-instant) ease-out;
+}
+
+.accordionButton:hover {
+  color: var(--color-text-tertiary);
+}
+
+.accordionIcon {
+  font-size: var(--font-size-lg);
+  color: var(--color-text-tertiary);
+  transition: transform var(--motion-duration-instant) ease-out;
+  flex-shrink: 0;
+}
+
+.accordionIconOpen {
+  transform: rotate(180deg);
+}
+
+.accordionContent {
+  display: grid;
+  grid-template-rows: 0fr;
+  transition: grid-template-rows var(--motion-duration-instant) ease-out;
+  overflow: hidden;
+}
+
+.accordionContentOpen {
+  grid-template-rows: 1fr;
+}
+
+.accordionInner {
+  min-height: 0;
+  overflow: hidden;
+}
+
+.accordionAnswer {
+  font-size: var(--font-size-md);
+  color: var(--color-text-tertiary);
+  line-height: 1.7;
+  margin: 0;
+  padding: 0 0 var(--space-16);
+}

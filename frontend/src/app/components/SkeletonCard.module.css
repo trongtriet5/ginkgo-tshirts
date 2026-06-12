@@ -1,0 +1,44 @@
+@keyframes pulse {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.4; }
+}
+
+.card {
+  display: flex;
+  flex-direction: column;
+}
+
+.block {
+  background-color: var(--color-surface-raised);
+  animation: pulse 1.5s ease-in-out infinite;
+  border-radius: 4px;
+}
+
+.image {
+  width: 100%;
+  aspect-ratio: 3 / 4;
+  margin-bottom: var(--space-8);
+  border-radius: 0;
+}
+
+.info {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-6);
+  padding: 0 var(--space-2);
+}
+
+.line {
+  height: 14px;
+  width: 100%;
+}
+
+.lineShort {
+  height: 12px;
+  width: 55%;
+}
+
+.lineMedium {
+  height: 12px;
+  width: 40%;
+}
