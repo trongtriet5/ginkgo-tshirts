@@ -35,7 +35,7 @@ export default function Home() {
         </div>
         <div className={styles.imageColumn}>
           <div className={styles.imageWrapperSquare}>
-            <Image src="/vietnamese_culture.jpg" alt="" fill className={styles.image} />
+            <Image src="/vietnamese_culture.jpg" alt="" fill sizes="50vw" className={styles.image} />
           </div>
         </div>
       </section>
@@ -52,7 +52,7 @@ export default function Home() {
         </div>
         <div className={styles.imageColumn}>
           <div className={styles.imageWrapperSquare}>
-            <Image src="/unique_fabric.jpg" alt="" fill className={styles.image} />
+            <Image src="/unique_fabric.jpg" alt="" fill sizes="50vw" className={styles.image} />
           </div>
         </div>
       </section>
@@ -69,7 +69,7 @@ export default function Home() {
         </div>
         <div className={styles.imageColumn}>
           <div className={styles.imageWrapperSquare}>
-            <Image src="/ginkgo_concept_store.jpg" alt="" fill className={styles.image} />
+            <Image src="/ginkgo_concept_store.jpg" alt="" fill sizes="50vw" className={styles.image} />
           </div>
         </div>
       </section>

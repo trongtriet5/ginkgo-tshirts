@@ -1,5 +1,5 @@
 import { Injectable, Logger, NotFoundException, BadRequestException } from '@nestjs/common';
-import { MysqlService } from '../mysql.service';
+import { DbService } from '../db.service';
 
 export interface OrderDto {
   id: number;
@@ -38,35 +38,34 @@ const VALID_STATUSES = ['pending', 'confirmed', 'shipped', 'delivered', 'cancell
 export class OrdersService {
   private readonly logger = new Logger(OrdersService.name);
 
-  constructor(private readonly mysql: MysqlService) {}
+  constructor(private readonly db: DbService) {}
 
   private async ensureTables(): Promise<void> {
-    await this.mysql.query(`
+    await this.db.query(`
       CREATE TABLE IF NOT EXISTS orders (
-        id INT AUTO_INCREMENT PRIMARY KEY,
+        id SERIAL PRIMARY KEY,
         customer_name VARCHAR(255) NOT NULL,
         customer_email VARCHAR(255),
         customer_phone VARCHAR(50),
         customer_address TEXT,
-        status ENUM('pending','confirmed','shipped','delivered','cancelled') DEFAULT 'pending',
+        status VARCHAR(50) DEFAULT 'pending' CHECK (status IN ('pending','confirmed','shipped','delivered','cancelled')),
         total_amount DECIMAL(12,0),
         payment_method VARCHAR(50),
         notes TEXT,
         created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-        updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
+        updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
       )
     `);
-    await this.mysql.query(`
+    await this.db.query(`
       CREATE TABLE IF NOT EXISTS order_items (
-        id INT AUTO_INCREMENT PRIMARY KEY,
-        order_id INT NOT NULL,
+        id SERIAL PRIMARY KEY,
+        order_id INT NOT NULL REFERENCES orders(id) ON DELETE CASCADE,
         product_id INT,
         product_name VARCHAR(255),
         sku VARCHAR(255),
         quantity INT NOT NULL DEFAULT 1,
         price DECIMAL(12,0),
-        subtotal DECIMAL(12,0),
-        FOREIGN KEY (order_id) REFERENCES orders(id) ON DELETE CASCADE
+        subtotal DECIMAL(12,0)
       )
     `);
   }
@@ -90,18 +89,18 @@ export class OrdersService {
     const where = conditions.length > 0 ? 'WHERE ' + conditions.join(' AND ') : '';
 
     const countSql = `SELECT COUNT(*) AS total FROM orders o ${where}`;
-    const countRows = await this.mysql.query<any>(countSql, params);
+    const countRows = await this.db.query<any>(countSql, params);
     const total = Number(countRows[0]?.total) || 0;
     const totalPages = Math.ceil(total / limit);
 
     const sql = `
       SELECT * FROM orders o ${where} ORDER BY o.created_at DESC LIMIT ? OFFSET ?
     `;
-    const rows = await this.mysql.query<any>(sql, [...params, String(limit), String(offset)]);
+    const rows = await this.db.query<any>(sql, [...params, Number(limit), Number(offset)]);
 
     const data: OrderDto[] = [];
     for (const r of rows) {
-      const items = await this.mysql.query<any>(
+      const items = await this.db.query<any>(
         'SELECT * FROM order_items WHERE order_id = ?', [String(r.id)],
       );
       data.push(this.mapOrder(r, items));
@@ -112,10 +111,10 @@ export class OrdersService {
 
   async findOne(id: number): Promise<OrderDto | null> {
     await this.ensureTables();
-    const rows = await this.mysql.query<any>('SELECT * FROM orders WHERE id = ?', [String(id)]);
+    const rows = await this.db.query<any>('SELECT * FROM orders WHERE id = ?', [String(id)]);
     if (rows.length === 0) return null;
 
-    const items = await this.mysql.query<any>(
+    const items = await this.db.query<any>(
       'SELECT * FROM order_items WHERE order_id = ?', [String(id)],
     );
     return this.mapOrder(rows[0], items);
@@ -157,9 +156,9 @@ export class OrdersService {
       return { ...item, quantity: qty, price, subtotal };
     });
 
-    const orderResult = await this.mysql.query<any>(
+    const orderResult = await this.db.query<any>(
       `INSERT INTO orders (customer_name, customer_email, customer_phone, customer_address, total_amount, payment_method, notes, status)
-       VALUES (?, ?, ?, ?, ?, ?, ?, 'pending')`,
+       VALUES (?, ?, ?, ?, ?, ?, ?, 'pending') RETURNING id`,
       [
         data.customerName.trim(),
         data.customerEmail?.trim() || null,
@@ -170,10 +169,10 @@ export class OrdersService {
         data.notes?.trim() || null,
       ],
     );
-    const orderId = (orderResult as any).insertId;
+    const orderId = orderResult[0].id;
 
     for (const item of validatedItems) {
-      await this.mysql.query(
+      await this.db.query(
         `INSERT INTO order_items (order_id, product_id, product_name, sku, quantity, price, subtotal)
          VALUES (?, ?, ?, ?, ?, ?, ?)`,
         [
@@ -197,7 +196,7 @@ export class OrdersService {
       throw new BadRequestException(`Invalid status. Must be one of: ${VALID_STATUSES.join(', ')}`);
     }
 
-    const existing = await this.mysql.query<any>('SELECT id, status FROM orders WHERE id = ?', [String(id)]);
+    const existing = await this.db.query<any>('SELECT id, status FROM orders WHERE id = ?', [String(id)]);
     if (existing.length === 0) {
       throw new NotFoundException(`Order ${id} not found`);
     }
@@ -217,7 +216,7 @@ export class OrdersService {
       );
     }
 
-    await this.mysql.query('UPDATE orders SET status = ? WHERE id = ?', [status, String(id)]);
+    await this.db.query('UPDATE orders SET status = ? WHERE id = ?', [status, String(id)]);
   }
 
   async update(id: number, data: {
@@ -231,7 +230,7 @@ export class OrdersService {
     [key: string]: any;
   }): Promise<void> {
     await this.ensureTables();
-    const existing = await this.mysql.query<any>('SELECT id FROM orders WHERE id = ?', [String(id)]);
+    const existing = await this.db.query<any>('SELECT id FROM orders WHERE id = ?', [String(id)]);
     if (existing.length === 0) {
       throw new NotFoundException(`Order ${id} not found`);
     }
@@ -261,7 +260,7 @@ export class OrdersService {
 
     if (fields.length === 0) return;
     params.push(String(id));
-    await this.mysql.query(`UPDATE orders SET ${fields.join(', ')} WHERE id = ?`, params);
+    await this.db.query(`UPDATE orders SET ${fields.join(', ')} WHERE id = ?`, params);
   }
 
   private mapOrder(row: any, items: any[]): OrderDto {

@@ -1,5 +1,5 @@
 import { Injectable, Logger, NotFoundException, BadRequestException } from '@nestjs/common';
-import { MysqlService } from '../mysql.service';
+import { DbService } from '../db.service';
 import { lookupCategory, getPrefixesForGroup, getAllTypeGroups } from './category-mapping';
 
 export interface ProductDto {
@@ -40,7 +40,7 @@ export interface FilterOptions {
 export class ProductsService {
   private readonly logger = new Logger(ProductsService.name);
 
-  constructor(private readonly mysql: MysqlService) {}
+  constructor(private readonly db: DbService) {}
 
   async findAll(
     page: number = 1,
@@ -54,7 +54,7 @@ export class ProductsService {
     try {
       const offset = (page - 1) * limit;
 
-      const conditions: string[] = ['p.active = 1', 'p.product_name IS NOT NULL'];
+      const conditions: string[] = ['p.active = 1', "p.product_name IS NOT NULL AND p.product_name != ''"];
       const params: any[] = [];
 
       if (productGroup) {
@@ -105,14 +105,14 @@ export class ProductsService {
         GROUP BY p.product_name, CONCAT(p.fabric, '.', p.gender, '.', p.category, '.', p.style, '.', p.design), p.color
         ORDER BY SID DESC
       `;
-      const rows = await this.mysql.query<any>(sql, params);
+      const rows = await this.db.query<any>(sql, params);
 
       // Compute typeGroup for each product and filter by categoryGroup in JS
       const allProducts = rows.map((r) => {
         const cat = lookupCategory(r.CODE || '');
         return {
           id: r.SID,
-          name: r.NAME || 'Unnamed Product',
+          name: r.NAME || r.type_name_detail_en || r.sku || 'Unnamed Product',
           code: r.CODE || '',
           color: r.COLOR || '',
           price: r.PRICE ? Number(r.PRICE) : null,
@@ -135,7 +135,7 @@ export class ProductsService {
       // Remove size params from sizes query (we want ALL sizes per product)
       // sizes were added at the end of params before the WHERE clause
       // We need to rebuild sizesParams without size filters
-      const sizesConditions: string[] = ['p.active = 1', 'p.product_name IS NOT NULL', 'p.size IS NOT NULL AND p.size != \'0\''];
+      const sizesConditions: string[] = ['p.active = 1', "p.product_name IS NOT NULL AND p.product_name != ''", "p.size IS NOT NULL AND p.size != '0'"];
       const sizesP: any[] = [];
       if (productGroup) {
         sizesConditions.push('p.product_group = ?');
@@ -164,7 +164,7 @@ export class ProductsService {
         GROUP BY p.product_name, CONCAT(p.fabric, '.', p.gender, '.', p.category, '.', p.style, '.', p.design), p.color, p.size
         ORDER BY p.size
       `;
-      const sizeRows = await this.mysql.query<any>(sizesSql, sizesP);
+      const sizeRows = await this.db.query<any>(sizesSql, sizesP);
       const sizeMap = new Map<string, string[]>();
       for (const sr of sizeRows) {
         const key = `${sr.NAME}|${sr.CODE || ''}|${sr.COLOR || ''}`;
@@ -204,7 +204,7 @@ export class ProductsService {
     productGroup?: string,
   ): Promise<FilterOptions> {
     try {
-      const conditions: string[] = ['p.active = 1', 'p.product_name IS NOT NULL'];
+      const conditions: string[] = ['p.active = 1', "p.product_name IS NOT NULL AND p.product_name != ''"];
       const params: any[] = [];
 
       if (productGroup) {
@@ -239,7 +239,7 @@ export class ProductsService {
         WHERE ${whereClause} AND p.size IS NOT NULL AND p.size != '0'
         ORDER BY p.size
       `;
-      const sizeRows = await this.mysql.query<any>(sizeSql, params);
+      const sizeRows = await this.db.query<any>(sizeSql, params);
 
       const colorSql = `
         SELECT DISTINCT p.color AS COLOR
@@ -247,7 +247,7 @@ export class ProductsService {
         WHERE ${whereClause} AND p.color IS NOT NULL
         ORDER BY p.color
       `;
-      const colorRows = await this.mysql.query<any>(colorSql, params);
+      const colorRows = await this.db.query<any>(colorSql, params);
 
       const sizes = sizeRows.map((r: any) => r.ITEM_SIZE);
       const colors = colorRows.map((r: any) => r.COLOR);
@@ -270,12 +270,13 @@ export class ProductsService {
           CONCAT(p.fabric, '.', p.gender, '.', p.category, '.', p.style, '.', p.design) AS CODE,
           p.color AS COLOR,
           p.size AS ITEM_SIZE,
-          MAX(p.price) AS PRICE
+          MAX(p.price) AS PRICE,
+          p.type_name_detail_en AS TYPE_DETAIL
         FROM products p
         WHERE p.id = ?
-        GROUP BY p.id, p.product_name, CONCAT(p.fabric, '.', p.gender, '.', p.category, '.', p.style, '.', p.design), p.color, p.size
+        GROUP BY p.id, p.product_name, CONCAT(p.fabric, '.', p.gender, '.', p.category, '.', p.style, '.', p.design), p.color, p.size, p.type_name_detail_en
       `;
-      const rows = await this.mysql.query<any>(sql, [id]);
+      const rows = await this.db.query<any>(sql, [id]);
       if (rows.length === 0) return null;
 
       const product = rows[0];
@@ -289,7 +290,7 @@ export class ProductsService {
           AND CONCAT(p.fabric, '.', p.gender, '.', p.category, '.', p.style, '.', p.design) = ?
           AND p.active = 1
       `;
-      const siblings = await this.mysql.query<any>(siblingsSql, [
+      const siblings = await this.db.query<any>(siblingsSql, [
         product.NAME,
         product.CODE,
       ]);
@@ -308,7 +309,7 @@ export class ProductsService {
 
       return {
         id: String(product.SID),
-        name: product.NAME || 'Unnamed Product',
+        name: product.NAME || product.TYPE_DETAIL || 'Unnamed Product',
         code: product.CODE || '',
         color: product.COLOR || '',
         size: product.ITEM_SIZE || '',
@@ -344,7 +345,7 @@ export class ProductsService {
     const where = conditions.length > 0 ? 'WHERE ' + conditions.join(' AND ') : '';
 
     const countSql = `SELECT COUNT(*) AS total FROM (SELECT MAX(p.id) AS id FROM products p ${where} GROUP BY p.product_name, CONCAT(p.fabric, '.', p.gender, '.', p.category, '.', p.style, '.', p.design), p.color) sub`;
-    const countRows = await this.mysql.query<any>(countSql, params);
+    const countRows = await this.db.query<any>(countSql, params);
     const total = Number(countRows[0]?.total) || 0;
     const totalPages = Math.ceil(total / limit);
 
@@ -357,7 +358,7 @@ export class ProductsService {
         p.sku,
         p.fabric, p.gender, p.category, p.style, p.design,
         p.color AS COLOR,
-        GROUP_CONCAT(DISTINCT p.size) AS ITEM_SIZE,
+        string_agg(DISTINCT p.size, ',') AS ITEM_SIZE,
         MAX(p.price) AS PRICE,
         p.type_name_detail_en,
         p.type_name_group,
@@ -368,13 +369,13 @@ export class ProductsService {
       ORDER BY MAX(p.id) DESC
       LIMIT ${Number(limit)} OFFSET ${Number(offset)}
     `;
-    const rows = await this.mysql.query<any>(sql, params);
+    const rows = await this.db.query<any>(sql, params);
 
     const data = rows.map((r) => ({
       id: r.SID,
       upc: r.upc,
       productGroup: r.product_group,
-      name: r.NAME || 'Unnamed Product',
+      name: r.NAME || r.type_name_detail_en || 'Unnamed Product',
       sku: r.sku,
       fabric: r.fabric,
       gender: r.gender,
@@ -415,8 +416,9 @@ export class ProductsService {
     const sql = `
       INSERT INTO products (upc, product_group, product_name, sku, fabric, gender, category, style, design, color, size, price, type_name_detail_en, type_name_group, active)
       VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 1)
+      RETURNING id
     `;
-    const result = await this.mysql.query<any>(sql, [
+    const result = await this.db.query<any>(sql, [
       data.upc || null,
       data.productGroup || null,
       data.productName.trim(),
@@ -432,7 +434,7 @@ export class ProductsService {
       data.typeNameDetailEn || null,
       data.typeNameGroup || null,
     ]);
-    return { id: (result as any).insertId || 0 };
+    return { id: Number(result[0]?.id) || 0 };
   }
 
   async update(id: number, data: {
@@ -452,7 +454,7 @@ export class ProductsService {
     typeNameGroup?: string;
     [key: string]: any;
   }): Promise<void> {
-    const existing = await this.mysql.query<any>('SELECT id FROM products WHERE id = ?', [String(id)]);
+    const existing = await this.db.query<any>('SELECT id FROM products WHERE id = ?', [String(id)]);
     if (existing.length === 0) {
       throw new NotFoundException(`Product with id ${id} not found`);
     }
@@ -481,18 +483,18 @@ export class ProductsService {
     if (fields.length === 0) return;
 
     params.push(String(id));
-    await this.mysql.query(`UPDATE products SET ${fields.join(', ')} WHERE id = ?`, params);
+    await this.db.query(`UPDATE products SET ${fields.join(', ')} WHERE id = ?`, params);
   }
 
   async delete(id: number): Promise<void> {
-    const existing = await this.mysql.query<any>('SELECT id FROM products WHERE id = ?', [String(id)]);
+    const existing = await this.db.query<any>('SELECT id FROM products WHERE id = ?', [String(id)]);
     if (existing.length === 0) {
       throw new NotFoundException(`Product with id ${id} not found`);
     }
-    await this.mysql.query('UPDATE products SET active = 0 WHERE id = ?', [String(id)]);
+    await this.db.query('UPDATE products SET active = 0 WHERE id = ?', [String(id)]);
   }
 
   async restore(id: number): Promise<void> {
-    await this.mysql.query('UPDATE products SET active = 1 WHERE id = ?', [String(id)]);
+    await this.db.query('UPDATE products SET active = 1 WHERE id = ?', [String(id)]);
   }
 }

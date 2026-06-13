@@ -7,7 +7,7 @@ import { ProductsModule } from './products/products.module';
 import { AdminModule } from './admin/admin.module';
 import { OrdersModule } from './orders/orders.module';
 import { UploadModule } from './upload/upload.module';
-import { MysqlService } from './mysql.service';
+import { DbService } from './db.service';
 
 @Module({
   imports: [
@@ -21,6 +21,6 @@ import { MysqlService } from './mysql.service';
     UploadModule,
   ],
   controllers: [AppController],
-  providers: [AppService, MysqlService],
+  providers: [AppService, DbService],
 })
 export class AppModule {}

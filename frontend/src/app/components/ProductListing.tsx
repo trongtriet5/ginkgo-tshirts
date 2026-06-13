@@ -122,8 +122,8 @@ export default function ProductListing({
             <div className={styles.filterGroup}>
               <h3 className={styles.filterTitle}>Size</h3>
               <ul className={styles.filterList}>
-                {options.sizes.map((s) => (
-                  <li key={s} className={styles.filterItem}>
+                {options.sizes.map((s, i) => (
+                  <li key={s ?? `size-${i}`} className={styles.filterItem}>
                     <label>
                       <input
                         type="checkbox"
@@ -141,8 +141,8 @@ export default function ProductListing({
             <div className={styles.filterGroup}>
               <h3 className={styles.filterTitle}>Color</h3>
               <ul className={styles.filterList}>
-                {options.colors.map((c) => (
-                  <li key={c} className={styles.filterItem}>
+                  {options.colors.map((c, i) => (
+                  <li key={c ?? `color-${i}`} className={styles.filterItem}>
                     <label>
                       <input
                         type="checkbox"
@@ -175,9 +175,10 @@ export default function ProductListing({
                 >
                   <div className={styles.imageContainer}>
                     <Image
-                      src={`/ginkgo${((product.id - 1) % 5) + 1}.jpg`}
+                      src={`/ginkgo${((product.id - 1) % 4) + 1}.jpg`}
                       alt=""
                       fill
+                      sizes="(max-width: 768px) 50vw, 25vw"
                       className={styles.productImage}
                     />
                   </div>
